@@ -1,0 +1,46 @@
+FROM golang:latest AS build-env
+
+WORKDIR /build
+
+RUN apt update
+RUN apt install -y git build-essential
+
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.x86_64.a /usr/local/lib/libwasmvm_muslc.x86_64.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.aarch64.a /usr/local/lib/libwasmvm_muslc.aarch64.a
+
+RUN mkdir bin
+RUN git clone https://github.com/sei-protocol/sei-chain.git
+
+WORKDIR /build/sei-chain
+
+RUN cd sei-chain && \
+  git checkout 1.0.6beta-val-count-fix && \
+  make build -B && \
+  mv build/seid /build/bin/seid-1.0.6beta
+
+RUN cd sei-chain && \
+  git checkout 1.0.7beta-postfix && \
+  make build -B && \
+  mv build/seid /build/bin/seid-1.0.7beta-postfix
+
+RUN cd sei-chain && \
+  git checkout 1.0.8beta-hotfix && \
+  make build -B && \
+  mv build/seid /build/bin/seid-1.0.8beta
+
+FROM brochain/cosmovisor:latest
+
+RUN apt update
+RUN apt install -y ca-certificates jq netcat nano curl
+
+WORKDIR /root
+
+COPY --from=build-env /go/pkg/mod/github.com/!cosm!wasm/wasmvm@v1.0.0/api/libwasmvm*.so /usr/lib/
+COPY --from=build-env /sei/bin/seid* /usr/bin/
+RUN chmod +x /usr/bin/seid*
+
+ENV MONIKER=Brochain
+ENV DAEMON_HOME=/root/.sei
+ENV DAEMON_NAME=seid
+ENV DAEMON_GENESIS=1.0.6beta
+ENV DAEMON_UPGRADES="1.0.7beta-postfix 1.0.8beta"
