@@ -177,6 +177,34 @@ if [[ -n "$MAX_PAYLOAD" ]]; then
     sed -i.bak -e "s|^max-packet-msg-payload-size *=.*|max-packet-msg-payload-size = $MAX_PAYLOAD|" $CONFIG_DIR/config.toml
 fi
 
+if [[ -n "$MAX_TXS_BYTES" ]]; then
+    sed -i.bak -e "s|^max_txs_bytes *=.*|max_txs_bytes = $MAX_TXS_BYTES|" $CONFIG_DIR/config.toml
+fi
+
+if [[ -n "$MAX_TX_BYTES" ]]; then
+    sed -i.bak -e "s|^max_tx_bytes *=.*|max_tx_bytes = $MAX_TX_BYTES|" $CONFIG_DIR/config.toml
+fi
+
+if [[ -n "$MAX_IN_PEERS" ]]; then
+    sed -i.bak -e "s|^max_num_inbound_peers *=.*|max_num_inbound_peers = $MAX_IN_PEERS|" $CONFIG_DIR/config.toml
+fi
+
+if [[ -n "$MAX_OUT_PEERS" ]]; then
+    sed -i.bak -e "s|^max_num_outbound_peers *=.*|max_num_outbound_peers = $MAX_OUT_PEERS|" $CONFIG_DIR/config.toml
+fi
+
+if [[ -n "$FLUSH_THROTTLE_TIMEOUT" ]]; then
+    sed -i.bak -e "s|^flush_throttle_timeout *=.*|flush_throttle_timeout = \"$FLUSH_THROTTLE_TIMEOUT\"|" $CONFIG_DIR/config.toml
+fi
+
+if [[ -n "$DIAL_TIMEOUT" ]]; then
+    sed -i.bak -e "s|^dial_timeout *=.*|dial_timeout = \"$DIAL_TIMEOUT\"|" $CONFIG_DIR/config.toml
+fi
+
+if [[ -n "$HANDSHAKE_TIMEOUT" ]]; then
+    sed -i.bak -e "s|^handshake_timeout *=.*|handshake_timeout = \"$HANDSHAKE_TIMEOUT\"|" $CONFIG_DIR/config.toml
+fi
+
 sed -i.bak -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"$MINIMUM_GAS_PRICE\"|" $CONFIG_DIR/app.toml
 sed -i.bak -e "s|^pruning *=.*|pruning = \"$PRUNING_STRATEGY\"|" $CONFIG_DIR/app.toml
 sed -i.bak -e "s|^pruning-keep-recent *=.*|pruning-keep-recent = \"$PRUNING_KEEP_RECENT\"|" $CONFIG_DIR/app.toml
@@ -214,6 +242,7 @@ if [[ -n "$PUBLIC_ADDRESS" ]]; then
     sed -i.bak -e "s|^external-address *=.*|external-address = \"$PUBLIC_ADDRESS\"|" $CONFIG_DIR/config.toml
 fi
 
+# Specific settings for SEI
 if [[ "$DAEMON_NAME" == "seid" ]]; then
     sed -i.bak -e "s|^p2p-no-peers-available-window-seconds *=.*|p2p-no-peers-available-window-seconds = 30|" $CONFIG_DIR/config.toml
     sed -i.bak -e "s|^statesync-no-peers-available-window-seconds *=.*|statesync-no-peers-available-window-seconds = 30|" $CONFIG_DIR/config.toml
@@ -232,6 +261,13 @@ if [[ "$DAEMON_NAME" == "seid" ]]; then
     else
         sed -i.bak -e "s|^sc-enable *=.*|sc-enable = false|" $CONFIG_DIR/app.toml
         sed -i.bak -e "s|^ss-enable *=.*|ss-enable = false|" $CONFIG_DIR/app.toml
+    fi
+    if [[ ! $(grep concurrency-workers $CONFIG_DIR/app.toml) ]]; then
+        sed -i.bak "/###                           Base Configuration                            ###/,+2 s|^$|\nconcurrency-workers = 500\nocc-enabled = true\n|" $CONFIG_DIR/app.toml
+    else
+        sed -i.bak -e "s|^# concurrency-workers *=.*|concurrency-workers = 500|" $CONFIG_DIR/app.toml
+        sed -i.bak -e "s|^concurrency-workers *=.*|concurrency-workers = 500|" $CONFIG_DIR/app.toml
+        sed -i.bak -e "s|^occ-enabled *=.*|occ-enabled = true|" $CONFIG_DIR/app.toml
     fi
 fi
 

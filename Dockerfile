@@ -36,8 +36,10 @@ WORKDIR /root
 RUN curl -L https://github.com/cosmos/cosmos-sdk/releases/download/cosmovisor%2Fv1.5.0/cosmovisor-v1.5.0-linux-amd64.tar.gz | tar xz && mv cosmovisor /usr/bin/cosmovisor
 COPY priv_validator_state.json priv_validator_state.json
 COPY entrypoint.sh /usr/bin/entrypoint.sh
+COPY ready-check.sh /usr/bin/ready-check.sh
+COPY health-check.sh /usr/bin/health-check.sh
 
-# RUN chmod +x /usr/bin/cosmovisor /usr/bin/cosmprund* /usr/bin/entrypoint.sh
-RUN chmod +x /usr/bin/cosmovisor /usr/bin/entrypoint.sh
+# RUN chmod +x /usr/bin/cosmovisor /usr/bin/cosmprund* /usr/bin/entrypoint.sh /usr/bin/ready-check.sh /usr/bin/health-check.sh
+RUN chmod +x /usr/bin/cosmovisor /usr/bin/entrypoint.sh /usr/bin/ready-check.sh /usr/bin/health-check.sh
 
 ENTRYPOINT [ "entrypoint.sh" ]

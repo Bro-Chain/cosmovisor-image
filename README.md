@@ -49,6 +49,7 @@
 | UNCONDITIONAL_PEER_IDS |               |
 | SEEDS                  |               |
 | PERSISTENT_PEERS       |               |
+| MAX_PAYLOAD            |               |
 
 ### State sync
 
@@ -68,6 +69,4 @@
 | RESET_ON_START     |               |
 | PRUNE_ON_START     |               |
 | COSMPRUND_APP      |               |
-| MEMPOOL_SIZE       |               |
 | HALT_HEIGHT        |               |
-| ENABLE_API         | true          |
